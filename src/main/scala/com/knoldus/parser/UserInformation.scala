@@ -78,6 +78,5 @@ object JsonDataParsingUsers {
 
 object UserDriver extends App{
   val users: List[User] = JsonDataParsingUsers.userData(JsonDataParsingUsers.jsonUserData)
-  println(users)
 }
 

@@ -66,7 +66,6 @@ object JsonCommentParsing {
 
 object CommentDriver extends App {
   val comments: List[Comment] = JsonCommentParsing.commentsData(JsonCommentParsing.jsonCommentsData)
-  println(comments)
 }
 
 //object PostDriver{

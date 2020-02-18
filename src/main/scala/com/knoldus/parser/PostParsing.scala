@@ -7,8 +7,6 @@ import org.apache.http.impl.client.HttpClientBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import scala.language.implicitConversions
-
 
 case class Post(userId: String, id: String, title: String, body: String)
 
@@ -65,5 +63,4 @@ object JsonPostParsing {
 
 object PostDriver extends App {
   val posts: List[Post] = JsonPostParsing.postsData(JsonPostParsing.jsonPostsData)
-  println(posts)
 }
