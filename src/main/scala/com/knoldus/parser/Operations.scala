@@ -1,8 +1,12 @@
 package com.knoldus.parser
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
+
 case class UserPost(user: User, post: List[Post])
 
-case class PostAndComments(post: Post, comments: List[Comment])
+case class PostAndComments(post: Post, comment: List[Comment])
 
 object Operations{
   /**
@@ -11,59 +15,70 @@ object Operations{
    * @param posts takes the list of type post
    * @return list of user mapped with the post done by user
    */
-  def userPostsOperations(users: List[User], posts: List[Post]): List[UserPost] = {
-    users.map(user=>UserPost(user,posts.filter(user.id==_.userId)))
+  def userPostsOperations(users: Future[List[User]], posts: Future[List[Post]]): Future[List[UserPost]] = {
+    users.map(users => posts.map(posts => (users.map(user=>UserPost(user,posts.filter(user.id==_.userId)))))).flatten
+
    }
   /**
    *
-   * @param post is the list of type post
-   * @param comment takes the list of type comment
+   * @param posts is the list of type post
+   * @param comments takes the list of type comment
    * @return list of post and comment done by same user
    */
-  def postsCommentsOperations(post: List[Post], comment: List[Comment]): List[PostAndComments] = {
-    post.map(posts => PostAndComments(posts, comment.filter(posts.id == _.postId)))
+  def postsCommentsOperations(posts: Future[List[Post]], comments: Future[List[Comment]]): Future[List[PostAndComments]] = {
+    //posts.map(posts=>comments.map(comments => posts.map(post => PostAndComments(post, comments.filter(post.id == _.postId)))))
+
+    val listOfPostAndComment = for {listOfPosts <- posts
+                                    listOfComments <- comments
+                                    } yield listOfPosts.map(post => PostAndComments(post, listOfComments.filter(_.postId == post.id)))
+    listOfPostAndComment
   }
   /**
    *
    * @param userPosts is the list of user and posts done by user
    * @return the user with most posts
    */
-  def mostUserPost(userPosts: List[UserPost]): (User, Int) = {
-    val countPost = for {eachPost <- userPosts
-                         } yield (eachPost.user, eachPost.post.length)
-    countPost.reduceLeft((first, second) => if (first._2 > second._2) first else second)
+  def mostUserPost(userPosts: Future[List[UserPost]]): Future[String] = {
+    val userWithMostPost = for{
+      listOfUserPost <- userPosts
+    } yield listOfUserPost.map(x => (x.user,x.post.length)).reduceLeft((first, second) => if (first._2 > second._2) first else second)
+    userWithMostPost.map(_._1.name)
   }
-  /**
-   * @param postComment is the list of post and comments
-   * @param user is the list of all users
-   * @return user whose post have most comments
-   */
-  def mostPostComment(postComment:List[PostAndComments],user:List[User]): (String, String, Int) ={
-    @scala.annotation.tailrec
-    def innerTest(innerList:List[PostAndComments], result:(String,Int)):(String,Int)= innerList match {
-      case Nil=>result
-      case head::Nil=>if(head.comments.length>=result._2) (head.post.userId,head.comments.length) else result
-      case head::tail=> if(head.comments.length>=result._2) innerTest(tail,(head.post.userId,head.comments.length)) else  innerTest(tail,result)
-    }
-    val result= innerTest(postComment,("",0))
-    val tupleList=user.filter(_.id==result._1)
-    (tupleList.head.name,result._1,result._2)
-  }
+
+//
+//  def postWithMaxComment(futureList: Future[List[PostAndComments]], users: List[User]): Future[String] = {
+//    @scala.annotation.tailrec
+//    def innerTest(futureLists: Future[List[PostAndComments]], result: Future[String]): Future[String] = {
+//
+//      futureLists.map{
+//        case Nil => result
+//        case _ :: Nil => result
+//        case head :: tail :: rest  => if (head.comment.length > tail.comment.length) {
+//          innerTest(Future{head::tail}, Future{head.post.userId})
+//        } else {innerTest(Future{tail:: rest},Future{tail.post.userId})}}.flatten
+//
+//  }
+//    val maxPost = innerTest(futureList, Future{"0"})
+//
+//    users.map(users => maxPost.map(mostPostComment =>
+//}
 
 }
 
 
 object Driver extends App{
 
-  val users: List[User] = JsonDataParsingUsers.userData(JsonDataParsingUsers.jsonUserData)
-  val comments: List[Comment] = JsonCommentParsing.commentsData(JsonCommentParsing.jsonCommentsData)
-  val posts: List[Post] = JsonPostParsing.postsData(JsonPostParsing.jsonPostsData)
+  val usersList: Future[List[User]] = JsonDataParsingUsers.userParser("https://jsonplaceholder.typicode.com/users")
+  val commentsList: Future[List[Comment]] = JsonCommentParsing.commentParser("https://jsonplaceholder.typicode.com/comments")
+  val postsList: Future[List[Post]] = JsonPostParsing.postParser("https://jsonplaceholder.typicode.com/posts")
 
 
-  val userPostList = Operations.userPostsOperations(users, posts)
-  val postCommentsList = Operations.postsCommentsOperations(posts,comments)
+  val userPostList = Operations.userPostsOperations(usersList, postsList)
+  val postCommentsList = Operations.postsCommentsOperations(postsList,commentsList)
 
   val mostUserPostCount = Operations.mostUserPost(userPostList)
-  val mostPostCommentCount = Operations.mostPostComment(postCommentsList,users)
+//  val mostPostCommentCount = Operations.mostPostComment(postCommentsList,usersList)
+  Thread.sleep(30000)
+  println(mostUserPostCount)
 
   }

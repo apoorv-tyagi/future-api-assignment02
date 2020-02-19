@@ -1,23 +1,18 @@
-//package com.knoldus.parser
-//
-//import org.scalatest._
-//
-//class OperationsSpec extends FlatSpec with BeforeAndAfterAll {
-//  var arithmeticOperations: OperationsSpec = new OperationsSpec
-//
-//  override def beforeAll(): Unit = {
-//    arithmeticOperations = new OperationsSpec()
-//  }
-//
-//  override def afterAll(): Unit = {
-//    if (arithmeticOperations != null) {
-//    }
-//  }
-//
-//  "user post " should "return list of post" in {
-//    val actualResult = Operations.userPostsOperations(List)
-//    val expectedResult = 10
-//    assert(expectedResult == actualResult)
-//  }
-//}
-//
+package com.knoldus.parser
+
+import org.scalatest._
+
+
+class OperationsSpec extends AsyncFlatSpec with BeforeAndAfterAll {
+
+    var max: Operations = _
+
+    override def beforeAll(): Unit = {
+      max = new Operations
+    }
+    "find Answers method " should " find User with Maximum number of posts " in {
+
+      max.mostUserPost
+    }
+
+}
