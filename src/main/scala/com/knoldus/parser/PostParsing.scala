@@ -13,17 +13,29 @@ object JsonPostParsing {
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 
-  def common(url: String): String = {
+  /**
+   * @param url contains json post data
+   * @return string of post data
+   */
+  def getData(url: String): String = {
     val request = new HttpGet(url)
     val client = HttpClientBuilder.create().build()
     val response = client.execute(request)
     IOUtils.toString(response.getEntity.getContent)
   }
 
+  /**
+   * @param postUrl takes the url containing user data
+   * @return extracts post data
+   */
   def postExtractor(postUrl: String): String = {
-    common(postUrl)
+    getData(postUrl)
   }
 
+  /**
+   * @param postUrl takes the url containing user data
+   * @return extracts post data
+   */
   def postParser(postUrl: String): Future[List[Post]] = {
     val post = parse(JsonPostParsing.postExtractor(postUrl))
     Future(post.children.map(_.extract[Post]))

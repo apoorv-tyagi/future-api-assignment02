@@ -20,7 +20,11 @@ case class Geo(lat: String, lng: String)
 object JsonDataParsingUsers {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
-  def common(url: String): String = {
+  /**
+   * @param url contains json user data
+   * @return string of user data
+   */
+  def getData(url: String): String = {
     val request = new HttpGet(url)
     val client = HttpClientBuilder.create().build()
     val response = client.execute(request)
@@ -28,12 +32,21 @@ object JsonDataParsingUsers {
 
   }
 
+  /**
+   * @param userUrl takes the url containing user data
+   * @return extracts user data
+   */
+  def userExtractor(userUrl: String): String = {
+    getData(userUrl)
+  }
+
+  /**
+   * @param userUrl takes the url containing user data
+   * @return future list of type user
+   */
   def userParser(userUrl: String): Future[List[User]] = {
     val user = parse(JsonDataParsingUsers.userExtractor(userUrl))
     Future(user.children.map(_.extract[User]))
-  }
-  def userExtractor(userUrl: String): String = {
-    common(userUrl)
   }
 
 }

@@ -14,17 +14,28 @@ object JsonCommentParsing {
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 
-  def common(url: String): String = {
+  /**
+   * @param url contains json comment data
+   * @return string of comment data
+   */
+  def getData(url: String): String = {
     val request = new HttpGet(url)
     val client = HttpClientBuilder.create().build()
     val response = client.execute(request)
     IOUtils.toString(response.getEntity.getContent)
   }
 
+  /**
+   * @param commentUrl takes the url containing user data
+   * @return extracts comment data
+   */
   def commentExtractor(commentUrl: String): String = {
-    common(commentUrl)
+    getData(commentUrl)
   }
-
+  /**
+   * @param commentUrl takes the url containing comment data
+   * @return future list of type comment
+   */
   def commentParser(commentUrl: String): Future[List[Comment]] = {
     val comment = parse(JsonCommentParsing.commentExtractor(commentUrl))
     Future(comment.children.map(_.extract[Comment]))

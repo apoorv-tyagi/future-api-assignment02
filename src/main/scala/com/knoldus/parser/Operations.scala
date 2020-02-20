@@ -1,15 +1,15 @@
 package com.knoldus.parser
 
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 case class UserPost(user: User, post: List[Post])
 
 case class PostAndComments(post: Post, comment: List[Comment])
 
-object Operations{
+object Operations {
 
   /**
    *
@@ -18,12 +18,13 @@ object Operations{
    * @return list of user mapped with the post done by user
    */
   def userPostsOperations(users: Future[List[User]], posts: Future[List[Post]]): Future[List[UserPost]] = {
-    users.map(users => posts.map(posts => users.map(user=>UserPost(user,posts.filter(user.id==_.userId))))).flatten
+    users.map(users => posts.map(posts => users.map(user => UserPost(user, posts.filter(user.id == _.userId))))).flatten
 
-   }
+  }
+
   /**
    *
-   * @param posts is the list of type post
+   * @param posts    is the list of type post
    * @param comments takes the list of type comment
    * @return list of post and comment done by same user
    */
@@ -35,34 +36,53 @@ object Operations{
                                     } yield listOfPosts.map(post => PostAndComments(post, listOfComments.filter(_.postId == post.id)))
     listOfPostAndComment
   }
+
   /**
    *
    * @param userPosts is the list of user and posts done by user
    * @return the user with most posts
    */
   def mostUserPost(userPosts: Future[List[UserPost]]): Future[String] = {
-    val userWithMostPost = for{
+    val userWithMostPost = for {
       listOfUserPost <- userPosts
-    } yield listOfUserPost.map(x => (x.user,x.post.length)).reduceLeft((first, second) => if (first._2 > second._2) first else second)
+    } yield listOfUserPost.map(x => (x.user, x.post.length)).reduceLeft((first, second) => if (first._2 > second._2) first else second)
     userWithMostPost.map(_._1.name)
   }
 
-
+  /**
+   * @param futureList is the future list of post and comment
+   * @param users      is the future list of users
+   * @return name of the user whose post has most comment
+   */
   def mostPostWithComment(futureList: Future[List[PostAndComments]], users: Future[List[User]]): Future[String] = {
 
     def innerTest(futureLists: Future[List[PostAndComments]], result: Future[String]): Future[String] = {
 
-      futureLists.map{
+      futureLists.map {
         case Nil => result
         case _ :: Nil => result
-        case head :: tail :: rest  => if (head.comment.length > tail.comment.length) {
-          innerTest(Future{head::rest}, Future{head.post.userId})
-        } else {innerTest(Future{tail:: rest},Future{tail.post.userId})}}.flatten
+        case head :: tail :: rest => if (head.comment.length > tail.comment.length) {
+          innerTest(Future {
+            head :: rest
+          }, Future {
+            head.post.userId
+          })
+        } else {
+          innerTest(Future {
+            tail :: rest
+          }, Future {
+            tail.post.userId
+          })
+        }
+      }.flatten
 
+    }
+
+    val maxPost = innerTest(futureList, Future {
+      "0"
+    })
+    users.map(allUser => maxPost.map(mostPostComment => allUser.filter(eachUser => eachUser.id == mostPostComment).head.name)).flatten
   }
-    val maxPost = innerTest(futureList, Future{"0"})
-    users.map(i => maxPost.map(mostPostComment => i.filter(k => k.id == mostPostComment).head.name)).flatten
-}
 
 
 }
@@ -76,17 +96,20 @@ object Driver {
 
 
   val userPostList: Future[List[UserPost]] = Operations.userPostsOperations(usersList, postsList)
-  val postCommentsList: Future[List[PostAndComments]] = Operations.postsCommentsOperations(postsList,commentsList)
+  val postCommentsList: Future[List[PostAndComments]] = Operations.postsCommentsOperations(postsList, commentsList)
 
   val mostUserPostCount: Future[String] = Operations.mostUserPost(userPostList)
-  val mostPostCommentCount: Future[String] = Operations.mostPostWithComment(postCommentsList,usersList)
+  val mostPostCommentCount: Future[String] = Operations.mostPostWithComment(postCommentsList, usersList)
 
-
-  def test(key: String): Future[String]={
+  /**
+   * @param key is the test input key
+   * @return function result for test cases
+   */
+  def test(key: String): Future[String] = {
     key match {
       case "post" => Operations.mostUserPost(userPostList)
-      case "comment" => Operations.mostPostWithComment(postCommentsList,usersList)
+      case "comment" => Operations.mostPostWithComment(postCommentsList, usersList)
     }
   }
 
-  }
+}
