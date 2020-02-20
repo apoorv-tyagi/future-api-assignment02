@@ -32,21 +32,6 @@ object JsonCommentParsing {
 
 }
 
-object CommentDriver extends App {
-  val comments: Future[List[Comment]] = JsonCommentParsing.commentParser("https://jsonplaceholder.typicode.com/comments")
-  println(comments)
-}
 
-//object PostDriver{
-//
-//  def po : List[Post]={
-//
-//    val resultPost = JsonPostParsing.getData("https://jsonplaceholder.typicode.com/posts")
-//    val posts = for {eachPost <- JsonPostParsing.parse(resultPost)} yield {
-//      eachPost
-//    }
-//    posts
-//  }
-//}
 
 

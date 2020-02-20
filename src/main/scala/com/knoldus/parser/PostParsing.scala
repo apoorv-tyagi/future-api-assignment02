@@ -31,7 +31,4 @@ object JsonPostParsing {
 
 }
 
-object PostDriver extends App {
-  val posts: Future[List[Post]] = JsonPostParsing.postParser("https://jsonplaceholder.typicode.com/posts")
-  println(posts)
-}
+

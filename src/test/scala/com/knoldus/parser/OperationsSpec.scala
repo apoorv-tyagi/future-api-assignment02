@@ -2,17 +2,20 @@ package com.knoldus.parser
 
 import org.scalatest._
 
+import scala.concurrent.Future
+
 
 class OperationsSpec extends AsyncFlatSpec with BeforeAndAfterAll {
 
-    var max: Operations = _
 
-    override def beforeAll(): Unit = {
-      max = new Operations
-    }
-    "find Answers method " should " find User with Maximum number of posts " in {
+    "Max Finder" should "eventually find user with maximum post" in {
+    val futureFind: Future[String] = Driver.test("post")
+    futureFind map { find => assert(find == "Clementina DuBuque") }
+  }
 
-      max.mostUserPost
-    }
+  "Max Finder" should "eventually find user with whose post has maximum comment" in {
+    val futureFind: Future[String] = Driver.test("comment")
+    futureFind map { find => assert(find == "Clementina DuBuque") }
+  }
 
 }

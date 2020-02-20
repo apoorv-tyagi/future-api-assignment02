@@ -38,11 +38,6 @@ object JsonDataParsingUsers {
 
 }
 
-object UserDriver extends App{
 
-  val users: Future[List[User]] = JsonDataParsingUsers.userParser("https://jsonplaceholder.typicode.com/users")
-  println(users)
-
-}
 
 
