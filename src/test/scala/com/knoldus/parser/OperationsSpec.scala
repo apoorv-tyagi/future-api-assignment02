@@ -4,9 +4,7 @@ import org.scalatest._
 
 import scala.concurrent.Future
 
-
 class OperationsSpec extends AsyncFlatSpec with BeforeAndAfterAll {
-
 
     "Max Finder" should "eventually find user with maximum post" in {
     val futureFind: Future[String] = Driver.test("post")
