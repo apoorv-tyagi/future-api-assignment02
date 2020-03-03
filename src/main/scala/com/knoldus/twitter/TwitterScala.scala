@@ -10,7 +10,8 @@ import scala.language.implicitConversions
 class TwitterScala extends TwitterConfiguration {
 
   /**
-   *This function is used to retrieve tweets.
+   * This function is used to retrieve tweets.
+   *
    * @param hashTag is the string of wanted hashtag
    * @return list of status
    */
@@ -26,6 +27,7 @@ class TwitterScala extends TwitterConfiguration {
 
   /**
    * This function is used to count the number of tweets.
+   *
    * @param tweets which is future of list of status
    * @return number of tweets
    */
@@ -40,6 +42,7 @@ class TwitterScala extends TwitterConfiguration {
 
   /**
    * This function is used to calculate average tweets per day.
+   *
    * @param tweetList is the future list of status of tweet
    * @return average tweets done per day
    */
@@ -54,6 +57,7 @@ class TwitterScala extends TwitterConfiguration {
 
   /**
    * This function is used to calculate average likes per tweet.
+   *
    * @param tweet is the string of required hash tag
    * @return average likes per tweet
    */
@@ -61,13 +65,14 @@ class TwitterScala extends TwitterConfiguration {
     val list = twitter.search(tweet)
     val tweets = list.getTweets.asScala.toList
     val likesCount = tweets.map(_.getFavoriteCount)
-    likesCount.size / tweets.size
+    likesCount.sum / tweets.size
   }.fallbackTo(Future {
     -1
   })
 
   /**
    * This function is used to calculate re-tweets per tweet
+   *
    * @param tweet is the string of required hash tag
    * @return average number of re-tweets per tweet
    */
@@ -76,7 +81,7 @@ class TwitterScala extends TwitterConfiguration {
     val list = twitter.search(tweet)
     val tweets = list.getTweets.asScala.toList
     val reTweetCount = tweets.map(_.getRetweetCount)
-    reTweetCount.size / tweets.size
+    reTweetCount.sum / tweets.size
   }.fallbackTo(Future {
     -1
   })
