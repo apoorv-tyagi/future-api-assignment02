@@ -11,10 +11,10 @@ object Driver extends App {
 
   val obj = new TwitterScala
   val resultTweetList = obj.retrieveHashTagTweet(hashTags)
-  val resultOfCount = obj.numberOfTweets(resultTweetList)
-  val resultOfAverageTweets = obj.getAverageTweetsPerDay(resultTweetList)
-  val resultOfAverageLikes = obj.getLikesPerTweet(query)
-  val resultOfAverageReTweets = obj.getReTweetsPerTweet(query)
+  val resultOfTweetCount = obj.numberOfTweets(query)
+  val resultOfAverageTweets = obj.getAverageTweetsPerDay(query)
+  val resultOfAverageLikes = obj.getAverageLikesPerTweet(query)
+  val resultOfAverageReTweets = obj.getAverageReTweetsPerTweet(query)
 
 
 }
