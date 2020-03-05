@@ -50,10 +50,11 @@ class OperationsSpec extends AsyncFlatSpec with BeforeAndAfterAll {
 
   "postWithMostComments" should "give user name whose post have most comment" in {
 
-    val actualResult = operations.postWithMostComments(testListPostComment, testUserList)
-
+    val actualResult: Future[String] = operations.postWithMostComments(testListPostComment, testUserList)
     val expectedResult: String = "Upanshu"
-    actualResult.map(result => assert(result == expectedResult ))
+    actualResult.map(result => {
+      assert(result == expectedResult )
+    })
 
   }
 
