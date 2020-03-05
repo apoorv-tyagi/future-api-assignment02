@@ -14,6 +14,8 @@ libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "4.0.6"
 
 libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.11"
 
+libraryDependencies += "com.typesafe" % "config" % "1.4.0"
+
 //3103621308-POGwiVS8fLmHwbis5kD8w4I6TQBqRQufeOSOVFL
 
 //5cg1jesJMkajQG4CJtAsEqGd7Y15pfKhEwIUT9H6wf1Az
