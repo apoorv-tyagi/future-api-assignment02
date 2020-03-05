@@ -65,7 +65,7 @@ class TwitterScala extends TwitterConfiguration {
     val list = twitter.search(tweet)
     val tweets = list.getTweets.asScala.toList
     val likesCount = tweets.map(_.getFavoriteCount)
-    likesCount.size / tweets.size
+    likesCount.sum / tweets.size
   }.fallbackTo(Future {
     -1
   })
