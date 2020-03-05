@@ -4,7 +4,7 @@ import twitter4j.{Query, _}
 
 object Driver extends App {
 
-  val hashTags: String = "#messi"
+  val hashTags: String = "#fcb"
 
   val query = new Query(hashTags)
 
@@ -16,8 +16,5 @@ object Driver extends App {
   val resultOfAverageLikes = obj.getLikesPerTweet(query)
   val resultOfAverageReTweets = obj.getReTweetsPerTweet(query)
 
-  Thread.sleep(9000)
-
-  println(resultOfAverageLikes)
 
 }
