@@ -12,8 +12,6 @@ class TwitterScalaSpec extends AsyncFlatSpec  {
 
   val twitter = new TwitterScala
 
-  case class Status(createdAt: String, id :Int, id_Str : Int, text : String, user: String)
-  val list: List[Status] = List(Status("noon", 1, 2 , "messi is best" , "upanshu"))
   val hashTags: String = "#fcb"
   val query = new Query(hashTags)
 
@@ -30,20 +28,40 @@ class TwitterScalaSpec extends AsyncFlatSpec  {
     actualBool.map(result => assert(result==expected))
   }
 
-  
 
   "getLikesPerTweet" should "give number of average likes" in{
 
-
     val actualResult = twitter.getLikesPerTweet(query)
+
     val expectedCount = 0
 
     actualResult.map(result => assert(result==expectedCount))
   }
 
+  "numberOfTweet" should "give number of tweet" in {
+
+    val actualResult = twitter.numberOfTweets(query)
+
+    val expectedResult = 15
+
+    actualResult.map(actual => assert(actual == expectedResult))
+
+  }
+
+  "getAverageTweetsPerDay" should( "give average number of tweets in a day") in{
+
+    val actualResult = twitter.getAverageTweetsPerDay(query)
+
+    val expected = 0
+
+    actualResult.map(result => assert(result >= expected))
+
+  }
+
   "getReTweetsPerTweet" should "give number of average re-tweets" in{
 
     val actualResult = twitter.getReTweetsPerTweet(query)
+
     val expectedCount = 0
 
     actualResult.map(result => assert(result >= expectedCount))
