@@ -31,9 +31,10 @@ class TwitterScala extends TwitterConfiguration {
    * @param tweets which is future of list of status
    * @return number of tweets
    */
-  def numberOfTweets(tweets: Future[List[Status]]): Future[Int] = {
+  def numberOfTweets(tweets: Query): Future[Int] = Future{
 
-    val countOfTweets = tweets.map(tweet => tweet.length)
+    val tweetList = twitter.search(tweets).getTweets.asScala.toList
+    val countOfTweets = tweetList.length
     countOfTweets
 
     }.fallbackTo(Future {
@@ -43,14 +44,14 @@ class TwitterScala extends TwitterConfiguration {
   /**
    * This function is used to calculate average tweets per day.
    *
-   * @param tweetList is the future list of status of tweet
+   * @param tweet is the future list of status of tweet
    * @return average tweets done per day
    */
-  def getAverageTweetsPerDay(tweetList: Future[List[Status]]): Future[Int] = {
+  def getAverageTweetsPerDay(tweet: Query): Future[Int] = Future{
 
-    val sortedPosts = tweetList
-      .map(tweet => tweet.sortWith((a, b) => a.getCreatedAt.before(b.getCreatedAt)))
-    sortedPosts.map(post => post.reverse.head.getCreatedAt.compareTo(post.head.getCreatedAt))
+    val tweetList = twitter.search(tweet).getTweets.asScala.toList
+    val sortedPosts = tweetList.sortWith((a, b) => a.getCreatedAt.before(b.getCreatedAt))
+    sortedPosts.reverse.head.getCreatedAt.compareTo(sortedPosts.head.getCreatedAt)
 
     }.fallbackTo(Future {
     -1
@@ -62,7 +63,7 @@ class TwitterScala extends TwitterConfiguration {
    * @param tweet is the string of required hash tag
    * @return average likes per tweet
    */
-  def getLikesPerTweet(tweet: Query): Future[Int] = Future {
+  def getAverageLikesPerTweet(tweet: Query): Future[Int] = Future {
     val list = twitter.search(tweet)
     val tweets = list.getTweets.asScala.toList
     val likesCount = tweets.map(_.getFavoriteCount)
@@ -77,7 +78,7 @@ class TwitterScala extends TwitterConfiguration {
    * @param tweet is the string of required hash tag
    * @return average number of re-tweets per tweet
    */
-  def getReTweetsPerTweet(tweet: Query): Future[Int] = Future {
+  def getAverageReTweetsPerTweet(tweet: Query): Future[Int] = Future {
 
     val list = twitter.search(tweet)
     val tweets = list.getTweets.asScala.toList
