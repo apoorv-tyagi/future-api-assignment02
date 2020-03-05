@@ -1,5 +1,6 @@
 package com.knoldus.twitter
 
+import com.typesafe.config.ConfigFactory
 import org.scalatest.FlatSpec
 import twitter4j.auth.AccessToken
 import twitter4j.{Twitter, TwitterFactory}
@@ -8,13 +9,16 @@ class TwitterConfigurationSpec extends FlatSpec {
 
   behavior of "getTwitterInstance"
   it should "instance of type Twitter" in {
-
+  val config = ConfigFactory.load()
   val twitter: Twitter = new TwitterFactory().getInstance()
-      twitter.setOAuthConsumer("G0x6p9CyXx5RVbK21ciHZvB2H",
-    "NrAjcRC8FVYgwWM4qsBConn4HefS5IzUFHDoNDcs8dh2YBWcvL")
+
+  // Authorising with your Twitter Application credentials
+  twitter.setOAuthConsumer(config.getString("consumer.key"),
+    config.getString("consumer.secret"))
   twitter.setOAuthAccessToken(new AccessToken(
-    "3103621308-FoEGRFM2kNYDmFdHVl38WpA10DzkXIxehx4Jit0",
-    "Aah1pOyPT9noHAkEWOeLRAdQz1aZh9LglmJtA43np2jH8"))
+    config.getString("token.key"),
+    config.getString("token.secret")))
+
    assert(twitter.getScreenName == "upanshu101")
   }
 
