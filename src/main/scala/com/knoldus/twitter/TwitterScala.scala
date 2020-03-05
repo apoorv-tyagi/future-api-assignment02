@@ -48,7 +48,8 @@ class TwitterScala extends TwitterConfiguration {
    */
   def getAverageTweetsPerDay(tweetList: Future[List[Status]]): Future[Int] = {
 
-    val sortedPosts = tweetList.map(tweet => tweet.sortWith((a, b) => a.getCreatedAt.before(b.getCreatedAt)))
+    val sortedPosts = tweetList
+      .map(tweet => tweet.sortWith((a, b) => a.getCreatedAt.before(b.getCreatedAt)))
     sortedPosts.map(post => post.reverse.head.getCreatedAt.compareTo(post.head.getCreatedAt))
 
     }.fallbackTo(Future {
