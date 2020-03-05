@@ -14,6 +14,7 @@ class TwitterScalaSpec extends AsyncFlatSpec  {
   val query = new Query(hashTags)
 
 
+
   "getTweets" should "retrieve tweets" in {
 
     val actualResult = twitter.retrieveHashTagTweet(hashTags)
@@ -22,16 +23,6 @@ class TwitterScalaSpec extends AsyncFlatSpec  {
     val expected = true
 
     actualBool.map(result => assert(result == expected))
-  }
-
-
-  "getAverageLikesPerTweet" should "give number of average likes" in {
-
-    val actualResult = twitter.getAverageReTweetsPerTweet(query)
-    val expectedCount = 0
-
-    actualResult.map(result => assert(result >= expectedCount))
-
   }
 
 
@@ -50,6 +41,15 @@ class TwitterScalaSpec extends AsyncFlatSpec  {
     val expected = 0
 
     actualResult.map(result => assert(result >= expected))
+
+  }
+
+    "getAverageLikesPerTweet" should "give number of average likes" in {
+
+    val actualResult = twitter.getAverageLikesPerTweet(query)
+    val expectedCount = 0
+
+    actualResult.map(result => assert(result >= expectedCount))
 
   }
 
