@@ -53,14 +53,12 @@ class Operations {
    * This method is used to extract name of the user whose posts has most comments.
    *
    * @param listOfPostAndComments is the list of posts mapped to comments
-   * @param user                  is the future list of user details
+   * @param user is the future list of user details
    * @return name of the user
    */
   def postWithMostComments(listOfPostAndComments: Future[List[PostAndComments]], user: Future[List[User]]): Future[String] = {
     listOfPostAndComments.map {
-      case Nil => Future {
-        "Nothing "
-      }
+      case Nil => Future {""}
       case _ => val sortedPostAndComments = listOfPostAndComments
         .map(_.sortWith((comparePointer, comparedToPointer) => comparePointer.comment.length <= comparedToPointer.comment.length))
         val resultPost = sortedPostAndComments.map(pointer => pointer.last.post.userId)

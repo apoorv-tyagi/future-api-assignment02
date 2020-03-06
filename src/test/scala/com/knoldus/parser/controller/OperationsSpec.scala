@@ -2,7 +2,6 @@ package com.knoldus.parser.controller
 
 import com.knoldus.parser.model.{Address, Comment, Company, Geo, Post, PostAndComments, User, UserPost}
 import org.scalatest._
-
 import scala.concurrent.Future
 
 
