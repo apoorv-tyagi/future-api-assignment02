@@ -1,8 +1,5 @@
 package com.knoldus.twitter
 
-import twitter4j.{Query, _}
-
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -10,91 +7,56 @@ import scala.language.implicitConversions
 /**
  * This class methods for twitter api operations.
  */
-class TwitterScala extends TwitterConfiguration {
-
-  /**
-   * This function is used to retrieve tweets.
-   *
-   * @param hashTag is the string of wanted hashTag
-   * @return list of status
-   */
-  def retrieveHashTagTweet(hashTag: String): Future[List[Status]] = Future {
-    val hashTagQuery = new Query(hashTag)
-    val result = twitter.search(hashTagQuery).getTweets.asScala.toList
-    result
-  }.fallbackTo {
-    Future {
-      List.empty[Status]
-    }
-  }
-
+class TwitterScala(tweetExtract: TweetExtract) {
   /**
    * This function is used to count the number of tweets.
    *
-   * @param tweets which is query of required hashTag
+   * @param hashTag which is query for which number of tweets are needed.
    * @return number of tweets
    */
-  def numberOfTweets(tweets: Query): Future[Int] = Future {
+  def numberOfTweets(hashTag: String): Future[Int] = {
 
-    val tweetList = twitter.search(tweets).getTweets.asScala.toList
-    val countOfTweets = tweetList.length
+    val tweetList = tweetExtract.retrieveHashTagTweet(hashTag)
+    val countOfTweets = tweetList.map(element => element.length)
     countOfTweets
-
-  }.fallbackTo(Future {
-    -1
-  })
-
-  /**
-   * This function is used to calculate average tweets per day.
-   *
-   * @param tweet is query of required hashTag
-   * @return average tweets done per day
-   */
-  def getAverageTweetsPerDay(tweet: Query): Future[Int] = Future {
-
-    val tweetList = twitter.search(tweet).getTweets.asScala.toList
-    val sortedPosts = tweetList.sortWith((a, b) => a.getCreatedAt.before(b.getCreatedAt))
-    sortedPosts.reverse.head.getCreatedAt.compareTo(sortedPosts.head.getCreatedAt)
-
-  }.fallbackTo(Future {
+    }.fallbackTo(Future {
     -1
   })
 
   /**
    * This function is used to calculate average likes per tweet.
    *
-   * @param tweet is the query of required hashTag
+   * @param hashTag is the query for which average likes per tweets is required
    * @return average likes per tweet
    */
-  def getAverageLikesPerTweet(tweet: Query): Future[Int] = Future {
+  def getAverageLikesPerTweet(hashTag: String): Future[Int] = {
 
-    val list = twitter.search(tweet)
-    val tweets = list.getTweets.asScala.toList
-    val likesCount = tweets.map(_.getFavoriteCount)
-    likesCount.sum / tweets.size
-  }.fallbackTo(Future {
+    val tweets = tweetExtract.retrieveHashTagTweet(hashTag)
+    val sizeOfTweet = tweets.map(element => element.size)
+
+    val likesCount = tweets.map(element => element.map(_.getFavouriteCount))
+    val sumOfTweet = likesCount.map(element => element.sum)
+    sumOfTweet.map(sum => sizeOfTweet.map(size => sum / size)).flatten
+    }.fallbackTo(Future {
     -1
   })
 
   /**
    * This function is used to calculate re-tweets per tweet
    *
-   * @param tweet is query of required hashTag
+   * @param hashTag is the query for which average re-tweet per tweet is required
    * @return average number of re-tweets per tweet
    */
-  def getAverageReTweetsPerTweet(tweet: Query): Future[Int] = Future {
+  def getAverageReTweetsPerTweet(hashTag: String): Future[Int] = {
 
-    val list = twitter.search(tweet)
-    val tweets = list.getTweets.asScala.toList
-    val reTweetCount = tweets.map(_.getRetweetCount)
-    reTweetCount.sum / tweets.size
-  }.fallbackTo(Future {
+    val tweets = tweetExtract.retrieveHashTagTweet(hashTag)
+    val sizeOfTweet = tweets.map(element => element.size)
+    val reTweetCount = tweets.map(element => element.map(_.getReTweetCountInt))
+    val sumOfReTweet = reTweetCount.map(element => element.sum)
+    sumOfReTweet.map(sum => sizeOfTweet.map(size => sum / size)).flatten
+    }.fallbackTo(Future {
     -1
   })
 
 
 }
-
-
-
-

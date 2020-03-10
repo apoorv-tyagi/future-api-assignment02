@@ -1,13 +1,13 @@
 package com.knoldus.twitter
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import twitter4j.auth.AccessToken
 import twitter4j.{Twitter, TwitterFactory}
 
 
 trait TwitterConfiguration {
 
-  val config = ConfigFactory.load()
+  val config: Config = ConfigFactory.load()
   val twitter: Twitter = new TwitterFactory().getInstance()
 
   // Authorising with your Twitter Application credentials
@@ -16,5 +16,6 @@ trait TwitterConfiguration {
   twitter.setOAuthAccessToken(new AccessToken(
     config.getString("token.key"),
     config.getString("token.secret")))
+
 
 }

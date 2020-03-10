@@ -1,67 +1,34 @@
 package com.knoldus.twitter
 
-
+import org.mockito.MockitoSugar
 import org.scalatest.flatspec.AsyncFlatSpec
-
-import twitter4j.{Query, _}
-
-
-class TwitterScalaSpec extends AsyncFlatSpec  {
-
-  val twitter = new TwitterScala
-
-  val hashTags: String = "#fcb"
-  val query = new Query(hashTags)
+import scala.concurrent.Future
 
 
+class TwitterScalaSpec extends AsyncFlatSpec with MockitoSugar  {
 
-  "getTweets" should "retrieve tweets" in {
+  val testUserTweet = List(UserTweet(1234,1,12), UserTweet(23534,4,45), UserTweet(5434,5,25), UserTweet(5434,3,23), UserTweet(8569,9,45))
+  val mockTwitterObject : TweetExtract = mock[TweetExtract]
+  val objectOfMock = new TwitterScala(mockTwitterObject)
+  val hashTag = "#messi"
 
-    val actualResult = twitter.retrieveHashTagTweet(hashTags)
-    val actualBool = actualResult.map(list => list.nonEmpty)
+  "numberOfTweets" should "return count of tweets" in {
 
-    val expected = true
-
-    actualBool.map(result => assert(result == expected))
+    when(mockTwitterObject.retrieveHashTagTweet(hashTag)).thenReturn(Future{testUserTweet})
+    objectOfMock.numberOfTweets(hashTag).map(expected => assert(expected==5))
   }
 
+  "averageReTweetsForReTweet" should "return average re-tweets for re-tweet" in {
 
-  "numberOfTweet" should "give number of tweet" in {
-
-    val actualResult = twitter.numberOfTweets(query)
-    val expectedResult = 15
-
-    actualResult.map(actual => assert(actual == expectedResult))
+    when(mockTwitterObject.retrieveHashTagTweet(hashTag)).thenReturn(Future{testUserTweet})
+    objectOfMock.getAverageReTweetsPerTweet(hashTag).map(expected => assert(expected == 30))
 
   }
 
-  "getAverageTweetsPerDay" should "give average number of tweets in a day" in {
+  "averageLikesForReTweets" should "return average like for re-tweet" in {
 
-    val actualResult = twitter.getAverageTweetsPerDay(query)
-    val expected = 0
-
-    actualResult.map(result => assert(result >= expected))
-
+    when(mockTwitterObject.retrieveHashTagTweet(hashTag)).thenReturn(Future{testUserTweet})
+    objectOfMock.getAverageLikesPerTweet(hashTag).map(expected => assert(expected == 4))
   }
-
-    "getAverageLikesPerTweet" should "give number of average likes" in {
-
-    val actualResult = twitter.getAverageLikesPerTweet(query)
-    val expectedCount = 0
-
-    actualResult.map(result => assert(result >= expectedCount))
-
-  }
-
-
-  "getAverageReTweetsPerTweet" should "give number of average re-tweets" in {
-
-    val actualResult = twitter.getAverageReTweetsPerTweet(query)
-    val expectedCount = 0
-
-    actualResult.map(result => assert(result >= expectedCount))
-
-  }
-
 
 }
